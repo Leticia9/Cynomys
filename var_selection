@@ -1,0 +1,38 @@
+
+###PROYECTO PERITOS DE LA PRADER
+##MODELOS DE NICHO DE ESPECIES PARA SITIOS LIMATICAMENTE PRIORITARIOS PARA SU PROTECCION##SELECION DE VARIABLES PARA MODELOS 
+#LETICIA CAB SULUB
+
+library(raster)
+library(usdm)
+
+#EXTRAER VALORES DE LAS BIOS PARA CADA REGISTRO 
+setwd("E:/Documents/PROYECTOS/LFL_Perritos/csv/")
+	sp <- read.csv("Cynomys_mexicanus_joint.csv") #deben tener solo dos columnas xy
+head(sp)
+sp2 <- sp[,2:3] #nos quedamos con las filas de latitud y longitud
+head(sp2)
+
+#19 bios
+setwd("E:/Documents/PROYECTOS/LFL_Perritos/capas_climat/")
+wc <- list.files("wc2_presente/", pattern = "*.asc", full.names = TRUE)
+wc2 <- stack(wc)
+plot(wc2[[1]])
+extrac <- extract(wc2, sp2)
+head(extrac)
+extrac = na.omit(extrac)
+
+#GENERAR UNA TABLA CON LAS CORRELACIONES DE LAS VARIABLES
+cor <- cor(extrac[, 1:ncol(extrac)], use = "pairwise.complete.obs")
+View(cor)
+setwd("E:/Documents/PROYECTOS/LFL_Perritos/csv/")
+write.csv(cor, "correl_Cynomys_mexicanus.csv")
+
+#### segundo set con USDM
+#norte
+plot(nortevar[[1]])
+
+vif.n <- vifcor(wc2, th=0.8)
+vif.n
+var.exclude <- exclude(wc2, vif.n)
+var.exclude  #las vaariables que quedan despues de excluir los que tienen problemas de colinearidad
