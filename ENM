@@ -1,0 +1,120 @@
+library(kuenm)
+### Candidate models
+
+```{r, eval=FALSE}
+occ_joint <- "Cynomys_mexicanus_joint.csv"
+occ_tra <- "Cynomys_mexicanus_train.csv"
+M_var_dir <- "M_variables"
+batch_cal <- "Candidate_models"
+out_dir <- "Candidate_Models"
+reg_mult <- c(seq(1, 5, 1))
+f_clas <- "all"
+args <- NULL
+maxent_path <- "E:/Documents/PROYECTOS/LFL_Perritos/kuenm/"
+wait <- FALSE
+run <- TRUE
+
+```
+```{r, eval=FALSE}
+kuenm_cal(occ.joint = occ_joint, occ.tra = occ_tra, M.var.dir = M_var_dir, batch = batch_cal,
+          out.dir = out_dir, reg.mult = reg_mult, f.clas = f_clas, args = args,
+          maxent.path = maxent_path, wait = wait, run = run)
+```
+
+### Evaluation and selection of best models
+```{r, eval=FALSE}
+occ_test <- "Cynomys_mexicanus_test.csv"
+out_eval <- "Calibration_results"
+threshold <- 5
+rand_percent <- 50
+iterations <- 500
+kept <- FALSE
+selection <- "OR_AICc"
+paral_proc <- FALSE # make this true to perform MOP calculations in parallel, recommended
+                    # only if a powerfull computer is used (see function's help)
+# Note, some of the variables used here as arguments were already created for the previous function
+```
+
+<br>
+
+This code also allows evaluating candidate models that were created previously, selecting those with best performance based on the three criteria.
+
+```{r, eval=FALSE}
+cal_eval <- kuenm_ceval(path = out_dir, occ.joint = occ_joint, occ.tra = occ_tra, occ.test = occ_test,
+                        batch = batch_cal, out.eval = out_eval, threshold = threshold,
+                        rand.percent = rand_percent, iterations = iterations, kept = kept,
+                        selection = selection, parallel.proc = paral_proc)
+```
+
+<br>
+
+### Final model creation
+After selecting parametrizations that produce best models, the next step is to create the final models, and if needed transfer them to other environmental data sets (e.g., to other time periods or other geographic regions). The function help is called via this code:
+
+```{r, eval=FALSE}
+help(kuenm_mod)
+```
+
+<br>
+
+For preparing the arguments for this function use the following chunk of code.
+
+```{r, eval=FALSE}
+batch_fin <- "Final_models"
+mod_dir <- "Final_Models"
+rep_n <- 1
+rep_type <- "Bootstrap"
+jackknife <- FALSE
+out_format <- "logistic"
+project <- TRUE
+G_var_dir <- "G_variables/"
+ext_type <- "all"
+write_mess <- FALSE
+write_clamp <- FALSE
+wait1 <- FALSE
+run1 <- TRUE
+args <- NULL
+# Again, some of the variables used here as arguments were already created for the previous functions
+```
+
+<br>
+
+The kuenm_mod function has the following syntax:
+
+```{r, eval=FALSE}
+kuenm_mod(occ.joint = occ_joint, M.var.dir = M_var_dir, out.eval = out_eval, batch = batch_fin,
+          rep.n = rep_n, rep.type = rep_type, jackknife = jackknife, out.dir = mod_dir,
+          out.format = out_format, project = project, G.var.dir = G_var_dir, ext.type = ext_type,
+          write.mess = write_mess, write.clamp = write_clamp, maxent.path = maxent_path,
+          args = args, wait = wait1, run = run1)
+```
+
+<br>
+
+### Final model evaluation
+
+Final model can be evaluated after being created; for this step, independent data are needed (data not used in the calibration process, ideally coming from different sources). The function help is called via this code:
+
+```{r, eval=FALSE}
+help(kuenm_feval)
+```
+
+<br>
+
+For preparing the arguments for this function, use the following chunk code.
+
+```{r, eval=FALSE}
+occ_ind <- "Cynomys_mexicanus_ind.csv"
+replicates <- TRUE
+out_feval <- "Final_Models_evaluation"
+# Most of the variables used here as arguments were already created for the previous functions
+```
+
+<br>
+
+The following is the code for using the function.
+
+```{r, eval=FALSE}
+fin_eval <- kuenm_feval(path = mod_dir, occ.joint = occ_joint, occ.ind = occ_ind, replicates = replicates,
+                        out.eval = out_feval, threshold = threshold, rand.percent = rand_percent,
+                        iterations = iterations, parallel.proc = paral_proc)
